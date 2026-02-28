@@ -213,14 +213,14 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
     };
   }, []);
 
-  const handleEventClick = (event: Event) => {
+  const handleEventClick = useCallback((event: Event) => {
     if (preferences?.event_interaction_mode !== 'hover') {
       setIsClickTriggered(true);
       setSelectedEvent(event);
     }
-  };
+  }, [preferences?.event_interaction_mode]);
 
-  const handleEventHover = (event: Event | null) => {
+  const handleEventHover = useCallback((event: Event | null) => {
     if (preferences?.event_interaction_mode === 'hover' && !isClickTriggered) {
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
@@ -241,7 +241,7 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
         }, 1000);
       }
     }
-  };
+  }, [preferences?.event_interaction_mode, isClickTriggered]);
 
   return (
     <div className="min-h-screen bg-gray-50">
