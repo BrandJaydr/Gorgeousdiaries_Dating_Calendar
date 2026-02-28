@@ -81,12 +81,16 @@ export function EventList({ events, onEdit, onDelete }: EventListProps) {
                   <button
                     onClick={() => onEdit(event)}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    aria-label="Edit event"
+                    title="Edit event"
                   >
                     <Edit2 className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => onDelete(event.id)}
                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    aria-label="Delete event"
+                    title="Delete event"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
