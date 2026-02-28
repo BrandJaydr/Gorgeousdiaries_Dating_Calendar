@@ -8,7 +8,6 @@ import { WeekView } from '../components/calendar/WeekView';
 import { MonthView } from '../components/calendar/MonthView';
 import { RollingMonthView } from '../components/calendar/RollingMonthView';
 import { FilterSidebar } from '../components/filters/FilterSidebar';
-import { EventCard } from '../components/calendar/EventCard';
 import { EventDetailModal } from '../components/calendar/EventDetailModal';
 
 const VIEW_LABELS: Record<CalendarView, string> = {
@@ -263,7 +262,7 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
               onClick={() => {
                 onClearGenre();
                 setFilters(prev => {
-                  const { genres, ...rest } = prev;
+                  const { genres: _, ...rest } = prev;
                   return rest;
                 });
               }}
