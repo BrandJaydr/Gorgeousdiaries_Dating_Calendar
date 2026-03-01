@@ -79,7 +79,7 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
 
       const eventsWithGenres = data?.map((event) => ({
         ...event,
-        genres: event.genres?.map((eg) => eg.genre).filter(Boolean) || [],
+        genres: (event.genres as any)?.map((eg: any) => eg.genre).filter(Boolean) || [],
       })) || [];
 
       setEvents(eventsWithGenres);
@@ -89,34 +89,6 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
       setLoading(false);
     }
   }, [profile]);
-
-  useEffect(() => {
-    if (user) {
-      fetchPreferencesCallback();
-    } else {
-      fetchEventsCallback(false);
-    }
-  }, [user, fetchPreferencesCallback, fetchEventsCallback]);
-
-  useEffect(() => {
-    if (preferences !== null || !user) {
-      fetchEventsCallback(preferences?.show_past_events || false);
-    }
-  }, [preferences, fetchEventsCallback, user]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [events, filters, applyFilters]);
-
-  useEffect(() => {
-    if (selectedGenre) {
-      setFilters(prev => ({
-        ...prev,
-        genres: [selectedGenre]
-      }));
-    }
-  }, [selectedGenre]);
-
 
   const applyFilters = useCallback(() => {
     let filtered = [...events];
@@ -194,6 +166,33 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
   const handleApplyFilters = useCallback(() => {
     applyFilters();
   }, [applyFilters]);
+
+  useEffect(() => {
+    if (user) {
+      fetchPreferencesCallback();
+    } else {
+      fetchEventsCallback(false);
+    }
+  }, [user, fetchPreferencesCallback, fetchEventsCallback]);
+
+  useEffect(() => {
+    if (preferences !== null || !user) {
+      fetchEventsCallback(preferences?.show_past_events || false);
+    }
+  }, [preferences, fetchEventsCallback, user]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [events, filters, applyFilters]);
+
+  useEffect(() => {
+    if (selectedGenre) {
+      setFilters(prev => ({
+        ...prev,
+        genres: [selectedGenre]
+      }));
+    }
+  }, [selectedGenre]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -457,7 +456,6 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
           displayMode={preferences?.event_display_mode || 'popup'}
           backgroundMode={preferences?.event_background_mode || 'white'}
           overlayOpacity={preferences?.overlay_opacity ?? 50}
-          isClickTriggered={isClickTriggered}
           onClose={() => {
             setSelectedEvent(null);
             setHoveredEvent(null);

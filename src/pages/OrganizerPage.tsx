@@ -45,7 +45,7 @@ export function OrganizerPage() {
 
       const eventsWithGenres = data?.map((event) => ({
         ...event,
-        genres: event.genres?.map((eg) => eg.genre).filter(Boolean) || [],
+        genres: (event.genres as any)?.map((eg: any) => eg.genre).filter(Boolean) || [],
       })) || [];
 
       setEvents(eventsWithGenres);
