@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Calendar, Menu, X, User, LogOut, Settings, FileText, Shield } from 'lucide-react';
 import { Genre, Event, UserPreferences } from '../../types';
 import { supabase } from '../../lib/supabase';
@@ -22,20 +22,12 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
   const menuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const userMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    fetchGenres();
-    fetchFeaturedEvents();
-    if (user) {
-      fetchPreferences();
-    }
-  }, [user]);
-
-  const fetchGenres = async () => {
+  const fetchGenres = useCallback(async () => {
     const { data } = await supabase.from('genres').select('*').order('name');
     if (data) setGenres(data);
-  };
+  }, []);
 
-  const fetchFeaturedEvents = async () => {
+  const fetchFeaturedEvents = useCallback(async () => {
     const { data } = await supabase
       .from('events')
       .select('*')
@@ -46,9 +38,9 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
       .limit(6);
 
     if (data) setFeaturedEvents(data);
-  };
+  }, []);
 
-  const fetchPreferences = async () => {
+  const fetchPreferencesCallback = useCallback(async () => {
     if (!user) return;
 
     const { data } = await supabase
@@ -58,7 +50,13 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
       .maybeSingle();
 
     if (data) setPreferences(data);
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchGenres();
+    fetchFeaturedEvents();
+    fetchPreferencesCallback();
+  }, [fetchGenres, fetchFeaturedEvents, fetchPreferencesCallback]);
 
   const handleSignOut = async () => {
     await signOut();

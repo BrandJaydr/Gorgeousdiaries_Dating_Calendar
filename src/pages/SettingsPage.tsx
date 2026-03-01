@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { User, Mail, Shield, Bell, Lock, Upload, Calendar, Trash2, AlertTriangle, MousePointer, Eye, Maximize2, Image } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -20,13 +20,7 @@ export function SettingsPage() {
     }
   }, [profile]);
 
-  useEffect(() => {
-    if (user) {
-      fetchPreferences();
-    }
-  }, [user]);
-
-  const fetchPreferences = async () => {
+  const fetchPreferencesCallback = useCallback(async () => {
     if (!user) return;
 
     const { data, error } = await supabase
@@ -53,7 +47,13 @@ export function SettingsPage() {
         setPreferences(newPrefs);
       }
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchPreferencesCallback();
+    }
+  }, [user, fetchPreferencesCallback]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus, Upload, Sparkles } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Plus, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Event } from '../types';
 import { supabase } from '../lib/supabase';
@@ -15,24 +15,11 @@ export function OrganizerPage() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const isOrganizer = profile?.role === 'organizer' || profile?.role === 'admin';
 
-  useEffect(() => {
-    if (!user) {
-      setShowAuthModal(true);
-      setLoading(false);
-      return;
-    }
-
-    if (isOrganizer) {
-      fetchMyEvents();
-    } else {
-      setLoading(false);
-    }
-  }, [user, profile, isOrganizer]);
-
-  const fetchMyEvents = async () => {
+  const fetchMyEvents = useCallback(async () => {
     if (!user) return;
 
     setLoading(true);
@@ -56,9 +43,9 @@ export function OrganizerPage() {
 
       if (error) throw error;
 
-      const eventsWithGenres = data?.map((event: any) => ({
+      const eventsWithGenres = data?.map((event) => ({
         ...event,
-        genres: event.genres?.map((eg: any) => eg.genre).filter(Boolean) || [],
+        genres: event.genres?.map((eg) => eg.genre).filter(Boolean) || [],
       })) || [];
 
       setEvents(eventsWithGenres);
@@ -67,7 +54,21 @@ export function OrganizerPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, profile?.role]);
+
+  useEffect(() => {
+    if (!user) {
+      setShowAuthModal(true);
+      setLoading(false);
+      return;
+    }
+
+    if (isOrganizer) {
+      fetchMyEvents();
+    } else {
+      setLoading(false);
+    }
+  }, [user, isOrganizer, fetchMyEvents]);
 
   const handleEventCreated = () => {
     setShowEventForm(false);
@@ -107,7 +108,7 @@ export function OrganizerPage() {
       window.location.reload();
     } catch (error) {
       console.error('Error upgrading account:', error);
-      alert('Failed to upgrade account. Please try again.');
+      setError('Failed to upgrade account. Please try again.');
     } finally {
       setUpgrading(false);
     }
@@ -120,6 +121,11 @@ export function OrganizerPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            {error}
+          </div>
+        )}
         {profile && profile.role === 'public' && (
           <div className="mb-6 bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-lg p-6">
             <div className="flex items-start gap-4">

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Check, X, Upload, Shield } from 'lucide-react';
+import { Check, X, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Event } from '../types';
 import { supabase } from '../lib/supabase';
@@ -35,9 +35,9 @@ export function AdminPage() {
 
       if (error) throw error;
 
-      const eventsWithGenres = data?.map((event: any) => ({
+      const eventsWithGenres = data?.map((event) => ({
         ...event,
-        genres: event.genres?.map((eg: any) => eg.genre).filter(Boolean) || [],
+        genres: event.genres?.map((eg) => eg.genre).filter(Boolean) || [],
       })) || [];
 
       setPendingEvents(eventsWithGenres);

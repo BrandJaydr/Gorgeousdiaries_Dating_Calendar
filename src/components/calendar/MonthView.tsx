@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Event } from '../../types';
-import { getMonthDates, groupEventsByDate, isToday, isSameDay } from '../../utils/calendar';
+import { getMonthDates, groupEventsByDate, isToday } from '../../utils/calendar';
 
 interface MonthViewProps {
   events: Event[];

@@ -8,7 +8,6 @@ import { WeekView } from '../components/calendar/WeekView';
 import { MonthView } from '../components/calendar/MonthView';
 import { RollingMonthView } from '../components/calendar/RollingMonthView';
 import { FilterSidebar } from '../components/filters/FilterSidebar';
-import { EventCard } from '../components/calendar/EventCard';
 import { EventDetailModal } from '../components/calendar/EventDetailModal';
 
 const VIEW_LABELS: Record<CalendarView, string> = {
@@ -40,34 +39,7 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      fetchPreferences();
-    } else {
-      fetchEvents(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (preferences !== null || !user) {
-      fetchEvents(preferences?.show_past_events || false);
-    }
-  }, [preferences, profile]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [events, filters]);
-
-  useEffect(() => {
-    if (selectedGenre) {
-      setFilters(prev => ({
-        ...prev,
-        genres: [selectedGenre]
-      }));
-    }
-  }, [selectedGenre]);
-
-  const fetchPreferences = async () => {
+  const fetchPreferencesCallback = useCallback(async () => {
     if (!user) return;
 
     const { data } = await supabase
@@ -77,9 +49,9 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
       .maybeSingle();
 
     setPreferences(data);
-  };
+  }, [user]);
 
-  const fetchEvents = async (showPastEvents: boolean) => {
+  const fetchEventsCallback = useCallback(async (showPastEvents: boolean) => {
     setLoading(true);
     try {
       let query = supabase
@@ -105,9 +77,9 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
 
       if (error) throw error;
 
-      const eventsWithGenres = data?.map((event: any) => ({
+      const eventsWithGenres = data?.map((event) => ({
         ...event,
-        genres: event.genres?.map((eg: any) => eg.genre).filter(Boolean) || [],
+        genres: event.genres?.map((eg) => eg.genre).filter(Boolean) || [],
       })) || [];
 
       setEvents(eventsWithGenres);
@@ -116,7 +88,35 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
     } finally {
       setLoading(false);
     }
-  };
+  }, [profile]);
+
+  useEffect(() => {
+    if (user) {
+      fetchPreferencesCallback();
+    } else {
+      fetchEventsCallback(false);
+    }
+  }, [user, fetchPreferencesCallback, fetchEventsCallback]);
+
+  useEffect(() => {
+    if (preferences !== null || !user) {
+      fetchEventsCallback(preferences?.show_past_events || false);
+    }
+  }, [preferences, fetchEventsCallback, user]);
+
+  useEffect(() => {
+    applyFilters();
+  }, [events, filters, applyFilters]);
+
+  useEffect(() => {
+    if (selectedGenre) {
+      setFilters(prev => ({
+        ...prev,
+        genres: [selectedGenre]
+      }));
+    }
+  }, [selectedGenre]);
+
 
   const applyFilters = useCallback(() => {
     let filtered = [...events];
@@ -263,7 +263,7 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
               onClick={() => {
                 onClearGenre();
                 setFilters(prev => {
-                  const { genres, ...rest } = prev;
+                  const { genres: _, ...rest } = prev;
                   return rest;
                 });
               }}
