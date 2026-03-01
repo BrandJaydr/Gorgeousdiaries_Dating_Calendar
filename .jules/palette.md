@@ -1,0 +1,3 @@
+## 2025-05-15 - [Password Visibility Toggle Pattern]
+**Learning:** A simple password visibility toggle significantly improves sign-in/up usability, but it must be carefully implemented for accessibility. Using `aria-label` on the toggle button and `aria-hidden="true"` on the icons within the button prevents screen reader confusion. Furthermore, maintaining focus states for keyboard users (e.g., using `focus-visible:ring-2`) is essential when adding interactive elements to existing form components.
+**Action:** Always include ARIA labels for icon-only buttons and ensure interactive elements have clearly visible focus indicators when styling custom components.
