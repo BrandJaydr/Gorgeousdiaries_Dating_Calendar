@@ -1,0 +1,4 @@
+## 2026-02-25 - Role Escalation via Incomplete RLS Policies
+**Vulnerability:** Authenticated users could promote themselves to 'admin' or change their 'subscription_tier' by directly updating their row in the `users` table, as the RLS `UPDATE` policy lacked column-level restrictions.
+**Learning:** Supabase RLS policies (e.g., `auth.uid() = id`) grant full update permissions on all columns of matching rows by default. While frontend UI might restrict these changes, the API remains exposed.
+**Prevention:** Supplement identity-based RLS policies with `BEFORE UPDATE` database triggers to enforce column-level security for sensitive fields like roles, permissions, and identity markers. Always use `SECURITY DEFINER` and `SET search_path = public` for these triggers to ensure they run with elevated privileges while remaining secure against search path hijacking.
