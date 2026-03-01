@@ -1,4 +1,4 @@
-import { Calendar, MapPin, Clock, DollarSign, Download } from 'lucide-react';
+import { Calendar, MapPin, DollarSign, Download } from 'lucide-react';
 import { Event } from '../../types';
 import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
 
