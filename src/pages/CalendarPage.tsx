@@ -36,8 +36,8 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
   const [isViewDropdownOpen, setIsViewDropdownOpen] = useState(false);
   const [isClickTriggered, setIsClickTriggered] = useState(false);
   const viewDropdownRef = useRef<HTMLDivElement>(null);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchPreferencesCallback = useCallback(async () => {
     if (!user) return;

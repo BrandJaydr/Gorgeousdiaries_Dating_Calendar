@@ -1,6 +1,7 @@
-import { Calendar, MapPin, DollarSign, Download } from 'lucide-react';
+import { Calendar, MapPin, DollarSign } from 'lucide-react';
 import { Event } from '../../types';
-import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
+import { formatDate, formatTime } from '../../utils/calendar';
+import { ExportButton } from './ExportButton';
 
 interface EventCardProps {
   event: Event;
@@ -9,11 +10,6 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, onClick, showDistance }: EventCardProps) {
-  const handleExport = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    downloadICalendar(event);
-  };
-
   return (
     <div
       onClick={onClick}
@@ -90,13 +86,7 @@ export function EventCard({ event, onClick, showDistance }: EventCardProps) {
           )}
         </div>
 
-        <button
-          onClick={handleExport}
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-        >
-          <Download className="w-4 h-4" />
-          Add to Calendar
-        </button>
+        <ExportButton event={event} className="mt-4 w-full" />
       </div>
     </div>
   );

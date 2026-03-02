@@ -1,6 +1,7 @@
-import { X, Calendar, MapPin, Clock, DollarSign, Download, Phone, Navigation } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, DollarSign, Phone, Navigation } from 'lucide-react';
 import { Event, EventDisplayMode, EventBackgroundMode } from '../../types';
-import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
+import { formatDate, formatTime } from '../../utils/calendar';
+import { ExportButton } from './ExportButton';
 
 interface EventDetailModalProps {
   event: Event;
@@ -11,11 +12,6 @@ interface EventDetailModalProps {
 }
 
 export function EventDetailModal({ event, displayMode, backgroundMode, overlayOpacity = 50, onClose }: EventDetailModalProps) {
-  const handleExport = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    downloadICalendar(event);
-  };
-
   const handleGetDirections = () => {
     const address = `${event.address}, ${event.city}, ${event.state} ${event.zip_code || ''}`;
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`, '_blank');
@@ -70,8 +66,9 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
             )}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-2 transition-colors"
-              aria-label="Close"
+              className="absolute top-4 right-4 bg-white/90 hover:bg-white rounded-full p-2 transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+              aria-label="Close modal"
+              title="Close"
             >
               <X className="w-5 h-5 text-gray-900" />
             </button>
@@ -169,13 +166,7 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
             </div>
 
             <div className="flex gap-3">
-              <button
-                onClick={handleExport}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
-                <Download className="w-5 h-5" />
-                Add to Calendar
-              </button>
+              <ExportButton event={event} className="flex-1 py-3" iconSize={5} />
               <button
                 onClick={handleGetDirections}
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
@@ -218,8 +209,9 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
               <h2 className={`text-2xl font-bold ${textColorClass}`}>{event.title}</h2>
               <button
                 onClick={onClose}
-                className="bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-colors"
-                aria-label="Close"
+                className="bg-gray-100 hover:bg-gray-200 rounded-full p-2 transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                aria-label="Close modal"
+                title="Close"
               >
                 <X className="w-6 h-6 text-gray-900" />
               </button>
@@ -334,13 +326,7 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
               </div>
 
               <div className="flex gap-4">
-                <button
-                  onClick={handleExport}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
-                >
-                  <Download className="w-6 h-6" />
-                  Add to Calendar
-                </button>
+                <ExportButton event={event} className="flex-1 py-4 text-lg" iconSize={6} />
                 <button
                   onClick={handleGetDirections}
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-lg"
@@ -369,8 +355,9 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
         <div className="max-w-5xl mx-auto animate-in slide-in-from-bottom-8 duration-500">
           <button
             onClick={onClose}
-            className="mb-4 flex items-center gap-2 bg-white/90 hover:bg-white rounded-full px-4 py-2 transition-colors font-medium"
-            aria-label="Go back"
+            className="mb-4 flex items-center gap-2 bg-white/90 hover:bg-white rounded-full px-4 py-2 transition-all font-medium focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+            aria-label="Go back to calendar"
+            title="Back to Calendar"
           >
             <X className="w-5 h-5" />
             Back to Calendar
@@ -490,13 +477,7 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
               </div>
 
               <div className="flex gap-4">
-                <button
-                  onClick={handleExport}
-                  className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-xl"
-                >
-                  <Download className="w-7 h-7" />
-                  Add to Calendar
-                </button>
+                <ExportButton event={event} className="flex-1 py-5 text-xl" iconSize={7} />
                 <button
                   onClick={handleGetDirections}
                   className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-xl"
