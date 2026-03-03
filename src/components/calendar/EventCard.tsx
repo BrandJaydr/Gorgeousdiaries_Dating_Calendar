@@ -1,4 +1,5 @@
-import { Calendar, MapPin, DollarSign, Download } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Calendar, MapPin, DollarSign, Download, Check } from 'lucide-react';
 import { Event } from '../../types';
 import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
 
@@ -9,9 +10,30 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, onClick, showDistance }: EventCardProps) {
+  const [isExported, setIsExported] = useState(false);
+  const exportTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (exportTimeoutRef.current) {
+        clearTimeout(exportTimeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleExport = (e: React.MouseEvent) => {
     e.stopPropagation();
     downloadICalendar(event);
+    setIsExported(true);
+
+    if (exportTimeoutRef.current) {
+      clearTimeout(exportTimeoutRef.current);
+    }
+
+    exportTimeoutRef.current = setTimeout(() => {
+      setIsExported(false);
+      exportTimeoutRef.current = null;
+    }, 2000);
   };
 
   return (
@@ -92,10 +114,24 @@ export function EventCard({ event, onClick, showDistance }: EventCardProps) {
 
         <button
           onClick={handleExport}
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          disabled={isExported}
+          className={`mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all duration-300 text-sm font-medium ${
+            isExported
+              ? 'bg-green-600 text-white cursor-default'
+              : 'bg-blue-600 text-white hover:bg-blue-700'
+          }`}
         >
-          <Download className="w-4 h-4" />
-          Add to Calendar
+          {isExported ? (
+            <>
+              <Check className="w-4 h-4" />
+              Added!
+            </>
+          ) : (
+            <>
+              <Download className="w-4 h-4" />
+              Add to Calendar
+            </>
+          )}
         </button>
       </div>
     </div>
