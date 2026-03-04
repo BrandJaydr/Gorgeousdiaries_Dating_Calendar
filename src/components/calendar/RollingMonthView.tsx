@@ -1,3 +1,4 @@
+import { useMemo, memo } from 'react';
 import { Event } from '../../types';
 import { getRollingMonthDates, groupEventsByDate, isToday } from '../../utils/calendar';
 import { EventCard } from './EventCard';
@@ -8,9 +9,15 @@ interface RollingMonthViewProps {
   onEventHover?: (event: Event | null) => void;
 }
 
-export function RollingMonthView({ events, onEventClick, onEventHover }: RollingMonthViewProps) {
+export const RollingMonthView = memo(function RollingMonthView({
+  events,
+  onEventClick,
+  onEventHover
+}: RollingMonthViewProps) {
+  // getRollingMonthDates is relatively inexpensive (60 iterations)
+  // and needs to stay fresh if the component remains mounted for a long time.
   const rollingDates = getRollingMonthDates(new Date());
-  const eventsByDate = groupEventsByDate(events);
+  const eventsByDate = useMemo(() => groupEventsByDate(events), [events]);
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -89,4 +96,4 @@ export function RollingMonthView({ events, onEventClick, onEventHover }: Rolling
       </div>
     </div>
   );
-}
+});

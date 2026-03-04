@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Calendar, MapPin, DollarSign, Download } from 'lucide-react';
 import { Event } from '../../types';
 import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
@@ -8,7 +9,7 @@ interface EventCardProps {
   showDistance?: boolean;
 }
 
-export function EventCard({ event, onClick, showDistance }: EventCardProps) {
+export const EventCard = memo(function EventCard({ event, onClick, showDistance }: EventCardProps) {
   const handleExport = (e: React.MouseEvent) => {
     e.stopPropagation();
     downloadICalendar(event);
@@ -100,4 +101,4 @@ export function EventCard({ event, onClick, showDistance }: EventCardProps) {
       </div>
     </div>
   );
-}
+});
