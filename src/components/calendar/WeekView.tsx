@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Event } from '../../types';
 import { getWeekDates, groupEventsByDate, isToday } from '../../utils/calendar';
@@ -12,8 +13,15 @@ interface WeekViewProps {
 }
 
 export function WeekView({ events, currentDate, onDateChange, onEventClick, onEventHover }: WeekViewProps) {
-  const weekDates = getWeekDates(currentDate);
-  const eventsByDate = groupEventsByDate(events);
+  const weekDates = useMemo(() =>
+    getWeekDates(currentDate),
+    [currentDate]
+  );
+
+  const eventsByDate = useMemo(() =>
+    groupEventsByDate(events),
+    [events]
+  );
 
   const goToPreviousWeek = () => {
     const newDate = new Date(currentDate);

@@ -1,0 +1,3 @@
+## 2025-05-14 - Calendar Optimization Sweep
+**Learning:** Using `useState` + `useEffect` for derived data (filtering) causes a double-render cycle. Expensive transformations like date grid generation and event grouping in calendar views were running on every render, including during micro-interactions like hovering.
+**Action:** Replace `useEffect` filtering with `useMemo`. Memoize date generation and grouping utilities in view components. Use `React.memo` on high-frequency components like `EventCard` to prevent re-render cascades. Extract complex dependencies from hook arrays to separate variables for better static analysis.
