@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Check, X, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { Event } from '../types';
+import { Event, Genre } from '../types';
 import { supabase } from '../lib/supabase';
 import { EventCard } from '../components/calendar/EventCard';
 import { CSVUploader } from '../components/admin/CSVUploader';
@@ -37,7 +37,7 @@ export function AdminPage() {
 
       const eventsWithGenres = data?.map((event) => ({
         ...event,
-        genres: (event.genres as any)?.map((eg: any) => eg.genre).filter(Boolean) || [],
+        genres: (event.genres as unknown as { genre: Genre }[])?.map((eg) => eg.genre).filter(Boolean) || [],
       })) || [];
 
       setPendingEvents(eventsWithGenres);

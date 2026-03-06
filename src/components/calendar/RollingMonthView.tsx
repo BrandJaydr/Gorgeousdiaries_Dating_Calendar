@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Event } from '../../types';
 import { getRollingMonthDates, groupEventsByDate, isToday } from '../../utils/calendar';
 import { EventCard } from './EventCard';
@@ -8,7 +9,7 @@ interface RollingMonthViewProps {
   onEventHover?: (event: Event | null) => void;
 }
 
-export function RollingMonthView({ events, onEventClick, onEventHover }: RollingMonthViewProps) {
+export const RollingMonthView = memo(function RollingMonthView({ events, onEventClick, onEventHover }: RollingMonthViewProps) {
   const rollingDates = getRollingMonthDates(new Date());
   const eventsByDate = groupEventsByDate(events);
 
@@ -89,4 +90,4 @@ export function RollingMonthView({ events, onEventClick, onEventHover }: Rolling
       </div>
     </div>
   );
-}
+});

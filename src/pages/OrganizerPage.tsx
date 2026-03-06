@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Sparkles } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { Event } from '../types';
+import { Event, Genre } from '../types';
 import { supabase } from '../lib/supabase';
 import { EventForm } from '../components/organizer/EventForm';
 import { EventList } from '../components/organizer/EventList';
@@ -45,7 +45,7 @@ export function OrganizerPage() {
 
       const eventsWithGenres = data?.map((event) => ({
         ...event,
-        genres: (event.genres as any)?.map((eg: any) => eg.genre).filter(Boolean) || [],
+        genres: (event.genres as unknown as { genre: Genre }[])?.map((eg) => eg.genre).filter(Boolean) || [],
       })) || [];
 
       setEvents(eventsWithGenres);

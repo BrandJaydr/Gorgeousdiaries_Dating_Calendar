@@ -18,7 +18,7 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [organizers, setOrganizers] = useState<any[]>([]);
+  const [organizers, setOrganizers] = useState<{ id: string; full_name: string | null; email: string; role: string }[]>([]);
 
   const [formData, setFormData] = useState({
     title: event?.title || '',
@@ -126,8 +126,8 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
       }
 
       onSuccess();
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }

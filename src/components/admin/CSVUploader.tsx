@@ -138,8 +138,8 @@ export function CSVUploader({ onImportComplete }: CSVUploaderProps) {
       );
       setFile(null);
       onImportComplete();
-    } catch (err: any) {
-      setError(err.message || 'An error occurred during import');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred during import');
     } finally {
       setLoading(false);
     }
