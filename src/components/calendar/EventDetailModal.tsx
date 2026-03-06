@@ -1,6 +1,7 @@
-import { X, Calendar, MapPin, Clock, DollarSign, Download, Phone, Navigation } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, DollarSign, Phone, Navigation } from 'lucide-react';
 import { Event, EventDisplayMode, EventBackgroundMode } from '../../types';
-import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
+import { formatDate, formatTime } from '../../utils/calendar';
+import { ExportButton } from './ExportButton';
 
 interface EventDetailModalProps {
   event: Event;
@@ -11,11 +12,6 @@ interface EventDetailModalProps {
 }
 
 export function EventDetailModal({ event, displayMode, backgroundMode, overlayOpacity = 50, onClose }: EventDetailModalProps) {
-  const handleExport = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    downloadICalendar(event);
-  };
-
   const handleGetDirections = () => {
     const address = `${event.address}, ${event.city}, ${event.state} ${event.zip_code || ''}`;
     window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`, '_blank');
@@ -169,13 +165,11 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
             </div>
 
             <div className="flex gap-3">
-              <button
-                onClick={handleExport}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
-                <Download className="w-5 h-5" />
-                Add to Calendar
-              </button>
+              <ExportButton
+                event={event}
+                className="flex-1 px-4 py-3 text-white rounded-lg font-medium"
+                iconSize={20}
+              />
               <button
                 onClick={handleGetDirections}
                 className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
@@ -334,13 +328,11 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
               </div>
 
               <div className="flex gap-4">
-                <button
-                  onClick={handleExport}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
-                >
-                  <Download className="w-6 h-6" />
-                  Add to Calendar
-                </button>
+                <ExportButton
+                  event={event}
+                  className="flex-1 px-6 py-4 text-white rounded-lg font-medium text-lg"
+                  iconSize={24}
+                />
                 <button
                   onClick={handleGetDirections}
                   className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-lg"
@@ -490,13 +482,11 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
               </div>
 
               <div className="flex gap-4">
-                <button
-                  onClick={handleExport}
-                  className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-xl"
-                >
-                  <Download className="w-7 h-7" />
-                  Add to Calendar
-                </button>
+                <ExportButton
+                  event={event}
+                  className="flex-1 px-8 py-5 text-white rounded-lg font-medium text-xl"
+                  iconSize={28}
+                />
                 <button
                   onClick={handleGetDirections}
                   className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-xl"
