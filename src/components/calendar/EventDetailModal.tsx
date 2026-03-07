@@ -1,4 +1,5 @@
-import { X, Calendar, MapPin, Clock, DollarSign, Download, Phone, Navigation } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { X, Calendar, MapPin, Clock, DollarSign, Download, Phone, Navigation, Check } from 'lucide-react';
 import { Event, EventDisplayMode, EventBackgroundMode } from '../../types';
 import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
 
@@ -11,9 +12,29 @@ interface EventDetailModalProps {
 }
 
 export function EventDetailModal({ event, displayMode, backgroundMode, overlayOpacity = 50, onClose }: EventDetailModalProps) {
+  const [isExported, setIsExported] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleExport = (e: React.MouseEvent) => {
     e.stopPropagation();
     downloadICalendar(event);
+    setIsExported(true);
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      setIsExported(false);
+    }, 2000);
   };
 
   const handleGetDirections = () => {
@@ -171,10 +192,23 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
             <div className="flex gap-3">
               <button
                 onClick={handleExport}
-                className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg transition-all duration-300 font-medium ${
+                  isExported
+                    ? 'bg-green-600 text-white'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
               >
-                <Download className="w-5 h-5" />
-                Add to Calendar
+                {isExported ? (
+                  <>
+                    <Check className="w-5 h-5" />
+                    Added!
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-5 h-5" />
+                    Add to Calendar
+                  </>
+                )}
               </button>
               <button
                 onClick={handleGetDirections}
@@ -336,10 +370,23 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
               <div className="flex gap-4">
                 <button
                   onClick={handleExport}
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
+                  className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-lg transition-all duration-300 font-medium text-lg ${
+                    isExported
+                      ? 'bg-green-600 text-white'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
                 >
-                  <Download className="w-6 h-6" />
-                  Add to Calendar
+                  {isExported ? (
+                    <>
+                      <Check className="w-6 h-6" />
+                      Added!
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-6 h-6" />
+                      Add to Calendar
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={handleGetDirections}
@@ -492,10 +539,23 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
               <div className="flex gap-4">
                 <button
                   onClick={handleExport}
-                  className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-xl"
+                  className={`flex-1 flex items-center justify-center gap-3 px-8 py-5 rounded-lg transition-all duration-300 font-medium text-xl ${
+                    isExported
+                      ? 'bg-green-600 text-white'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
                 >
-                  <Download className="w-7 h-7" />
-                  Add to Calendar
+                  {isExported ? (
+                    <>
+                      <Check className="w-7 h-7" />
+                      Added!
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-7 h-7" />
+                      Add to Calendar
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={handleGetDirections}
