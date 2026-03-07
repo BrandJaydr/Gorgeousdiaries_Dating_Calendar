@@ -1,0 +1,3 @@
+## 2025-03-07 - Calendar Optimization and Type Safety
+**Learning:** Derived state (like `filteredEvents`) managed via `useState` + `useEffect` causes an unnecessary second render cycle. Using `useMemo` eliminates this redundancy and keeps filtering logic co-located. Additionally, the project environment lacks `NodeJS` namespace in the browser context, making `ReturnType<typeof setTimeout>` the required standard for timer references.
+**Action:** Always use `useMemo` for derived data like filters or groupings. Replace `NodeJS.Timeout` with `ReturnType<typeof setTimeout>` in all frontend components to satisfy type checking.

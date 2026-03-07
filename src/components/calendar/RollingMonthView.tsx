@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Event } from '../../types';
 import { getRollingMonthDates, groupEventsByDate, isToday } from '../../utils/calendar';
 import { EventCard } from './EventCard';
@@ -8,9 +9,13 @@ interface RollingMonthViewProps {
   onEventHover?: (event: Event | null) => void;
 }
 
-export function RollingMonthView({ events, onEventClick, onEventHover }: RollingMonthViewProps) {
-  const rollingDates = getRollingMonthDates(new Date());
-  const eventsByDate = groupEventsByDate(events);
+export const RollingMonthView = memo(({ events, onEventClick, onEventHover }: RollingMonthViewProps) => {
+  // Memoize rolling dates to avoid recalculating on every render
+  // Using an empty dependency array as it's relative to "new Date()" which is fresh enough for a single session
+  const rollingDates = useMemo(() => getRollingMonthDates(new Date()), []);
+
+  // Memoize event grouping to avoid O(n) calculation on every render
+  const eventsByDate = useMemo(() => groupEventsByDate(events), [events]);
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -89,4 +94,4 @@ export function RollingMonthView({ events, onEventClick, onEventHover }: Rolling
       </div>
     </div>
   );
-}
+});
