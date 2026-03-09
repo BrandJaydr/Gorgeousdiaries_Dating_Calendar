@@ -3,7 +3,8 @@ import { Calendar, MapPin, DollarSign, Download } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Calendar, MapPin, DollarSign, Download, Check } from 'lucide-react';
 import { Event } from '../../types';
-import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
+import { formatDate, formatTime } from '../../utils/calendar';
+import { ExportButton } from './ExportButton';
 
 interface EventCardProps {
   event: Event;
@@ -113,6 +114,7 @@ export function EventCard({ event, onClick, showDistance }: EventCardProps) {
           )}
         </div>
 
+        <ExportButton event={event} className="mt-4 w-full" />
         <button
           onClick={handleExport}
           className={`mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
