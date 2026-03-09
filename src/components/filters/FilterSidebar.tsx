@@ -89,6 +89,7 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
           <button
             onClick={onClose}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            aria-label="Close filters"
           >
             <X className="w-5 h-5" />
           </button>
@@ -127,6 +128,7 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
               <button
                 onClick={handleLocationSearch}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-blue-600"
+                aria-label="Search location"
               >
                 <MapPin className="w-5 h-5" />
               </button>

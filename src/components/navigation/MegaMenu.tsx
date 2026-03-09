@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Calendar, Menu, X, User, LogOut, Settings, FileText, Shield } from 'lucide-react';
 import { Genre, Event, UserPreferences } from '../../types';
 import { supabase } from '../../lib/supabase';
@@ -19,23 +19,15 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
-  const menuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const userMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    fetchGenres();
-    fetchFeaturedEvents();
-    if (user) {
-      fetchPreferences();
-    }
-  }, [user]);
-
-  const fetchGenres = async () => {
+  const fetchGenres = useCallback(async () => {
     const { data } = await supabase.from('genres').select('*').order('name');
     if (data) setGenres(data);
-  };
+  }, []);
 
-  const fetchFeaturedEvents = async () => {
+  const fetchFeaturedEvents = useCallback(async () => {
     const { data } = await supabase
       .from('events')
       .select('*')
@@ -46,9 +38,9 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
       .limit(6);
 
     if (data) setFeaturedEvents(data);
-  };
+  }, []);
 
-  const fetchPreferences = async () => {
+  const fetchPreferencesCallback = useCallback(async () => {
     if (!user) return;
 
     const { data } = await supabase
@@ -58,7 +50,13 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
       .maybeSingle();
 
     if (data) setPreferences(data);
-  };
+  }, [user]);
+
+  useEffect(() => {
+    fetchGenres();
+    fetchFeaturedEvents();
+    fetchPreferencesCallback();
+  }, [fetchGenres, fetchFeaturedEvents, fetchPreferencesCallback]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -149,6 +147,9 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
                 <button
                   onClick={handleMenuClick}
                   className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-blue-600 transition-colors"
+                  aria-label="Browse Events menu"
+                  aria-expanded={isMenuOpen}
+                  aria-haspopup="true"
                 >
                   <Menu className="w-5 h-5" />
                   <span className="font-medium">Browse Events</span>
@@ -197,6 +198,9 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Toggle mobile menu"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -210,6 +214,9 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
                   <button
                     onClick={handleUserMenuClick}
                     className="flex items-center gap-2 px-3 md:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    aria-label="User account menu"
+                    aria-expanded={isUserMenuOpen}
+                    aria-haspopup="true"
                   >
                     <User className="w-4 h-4" />
                     <span className="hidden sm:block text-sm">{profile?.full_name || user.email?.split('@')[0] || 'Account'}</span>
@@ -273,7 +280,7 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
           </div>
 
           {isMobileMenuOpen && (
-            <div className="md:hidden pb-4 border-t border-gray-200 pt-4 space-y-2">
+            <div id="mobile-menu" className="md:hidden pb-4 border-t border-gray-200 pt-4 space-y-2">
               <button
                 onClick={() => handleMobileMenuClick(() => onViewChange('calendar'))}
                 className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-left transition-colors ${
