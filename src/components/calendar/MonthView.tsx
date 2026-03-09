@@ -1,6 +1,7 @@
+import { useMemo, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Event } from '../../types';
-import { getMonthDates, groupEventsByDate, isToday, isSameDay } from '../../utils/calendar';
+import { getMonthDates, groupEventsByDate, isToday } from '../../utils/calendar';
 
 interface MonthViewProps {
   events: Event[];
@@ -10,9 +11,16 @@ interface MonthViewProps {
   onEventHover?: (event: Event | null) => void;
 }
 
-export function MonthView({ events, currentDate, onDateChange, onEventClick, onEventHover }: MonthViewProps) {
-  const monthDates = getMonthDates(currentDate.getFullYear(), currentDate.getMonth());
-  const eventsByDate = groupEventsByDate(events);
+export const MonthView = memo(function MonthView({ events, currentDate, onDateChange, onEventClick, onEventHover }: MonthViewProps) {
+  const monthDates = useMemo(() =>
+    getMonthDates(currentDate.getFullYear(), currentDate.getMonth()),
+    [currentDate]
+  );
+
+  const eventsByDate = useMemo(() =>
+    groupEventsByDate(events),
+    [events]
+  );
 
   const goToPreviousMonth = () => {
     const newDate = new Date(currentDate);
@@ -120,4 +128,4 @@ export function MonthView({ events, currentDate, onDateChange, onEventClick, onE
       </div>
     </div>
   );
-}
+});
