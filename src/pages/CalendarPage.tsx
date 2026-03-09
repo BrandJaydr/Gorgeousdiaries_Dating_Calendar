@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Filter, Calendar as CalendarIcon, List, ChevronDown } from 'lucide-react';
-import { Event, EventFilters, CalendarView, UserPreferences } from '../types';
+import { Event, Genre, EventFilters, CalendarView, UserPreferences } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { calculateDistance } from '../utils/geolocation';
@@ -76,10 +76,10 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
 
       if (error) throw error;
 
-      const eventsWithGenres = data?.map((event) => ({
+      const eventsWithGenres = (data || []).map((event) => ({
         ...event,
-        genres: (event.genres as any)?.map((eg: any) => eg.genre).filter(Boolean) || [],
-      })) || [];
+        genres: (event.genres as unknown as { genre: Genre }[])?.map((eg) => eg.genre).filter(Boolean) || [],
+      })) as Event[];
 
       setEvents(eventsWithGenres);
     } catch (error) {
