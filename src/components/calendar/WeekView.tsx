@@ -13,6 +13,7 @@ interface WeekViewProps {
 }
 
 export const WeekView = memo(({ events, currentDate, onDateChange, onEventClick, onEventHover }: WeekViewProps) => {
+export const WeekView = memo(function WeekView({ events, currentDate, onDateChange, onEventClick, onEventHover }: WeekViewProps) {
   const weekDates = useMemo(() =>
     getWeekDates(currentDate),
     [currentDate]
@@ -121,5 +122,3 @@ export const WeekView = memo(({ events, currentDate, onDateChange, onEventClick,
     </div>
   );
 });
-
-WeekView.displayName = 'WeekView';

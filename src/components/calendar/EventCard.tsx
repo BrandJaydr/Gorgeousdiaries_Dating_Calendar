@@ -1,7 +1,10 @@
 import { memo } from 'react';
 import { Calendar, MapPin, DollarSign, Download } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Calendar, MapPin, DollarSign, Download, Check } from 'lucide-react';
 import { Event } from '../../types';
-import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
+import { formatDate, formatTime } from '../../utils/calendar';
+import { ExportButton } from './ExportButton';
 
 interface EventCardProps {
   event: Event;
@@ -10,9 +13,28 @@ interface EventCardProps {
 }
 
 export const EventCard = memo(({ event, onClick, showDistance }: EventCardProps) => {
+export const EventCard = memo(function EventCard({ event, onClick, showDistance }: EventCardProps) {
+export function EventCard({ event, onClick, showDistance }: EventCardProps) {
+  const [isAdded, setIsAdded] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   const handleExport = (e: React.MouseEvent) => {
     e.stopPropagation();
     downloadICalendar(event);
+
+    setIsAdded(true);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setIsAdded(false);
+    }, 2000);
   };
 
   return (
@@ -25,6 +47,7 @@ export const EventCard = memo(({ event, onClick, showDistance }: EventCardProps)
           <img
             src={event.image_url}
             alt={event.title}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
           {event.featured && (
@@ -91,16 +114,27 @@ export const EventCard = memo(({ event, onClick, showDistance }: EventCardProps)
           )}
         </div>
 
+        <ExportButton event={event} className="mt-4 w-full" />
         <button
           onClick={handleExport}
-          className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+          className={`mt-4 w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
+            isAdded ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
+          } text-white`}
+          aria-live="polite"
         >
-          <Download className="w-4 h-4" />
-          Add to Calendar
+          {isAdded ? (
+            <>
+              <Check className="w-4 h-4" />
+              Added!
+            </>
+          ) : (
+            <>
+              <Download className="w-4 h-4" />
+              Add to Calendar
+            </>
+          )}
         </button>
       </div>
     </div>
   );
 });
-
-EventCard.displayName = 'EventCard';
