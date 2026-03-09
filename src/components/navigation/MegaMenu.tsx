@@ -198,6 +198,7 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
                 aria-label="Toggle mobile menu"
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu"

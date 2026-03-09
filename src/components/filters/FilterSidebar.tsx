@@ -112,7 +112,11 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
               disabled={isLoadingLocation}
               className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 mb-3"
             >
-              <Navigation className="w-4 h-4" />
+              {isLoadingLocation ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+              ) : (
+                <Navigation className="w-4 h-4" />
+              )}
               {isLoadingLocation ? 'Getting location...' : 'Use My Location'}
             </button>
 
@@ -129,6 +133,7 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
                 onClick={handleLocationSearch}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-blue-600"
                 aria-label="Search location"
+                title="Search location"
               >
                 <MapPin className="w-5 h-5" />
               </button>
