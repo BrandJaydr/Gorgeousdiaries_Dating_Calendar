@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Filter, Calendar as CalendarIcon, List, ChevronDown } from 'lucide-react';
 import { Event, EventFilters, CalendarView, UserPreferences } from '../types';
 import { supabase } from '../lib/supabase';
@@ -24,7 +24,6 @@ interface CalendarPageProps {
 export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps) {
   const { user, profile } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [filters, setFilters] = useState<EventFilters>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [calendarView, setCalendarView] = useState<CalendarView>('month');
@@ -36,8 +35,8 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
   const [isViewDropdownOpen, setIsViewDropdownOpen] = useState(false);
   const [isClickTriggered, setIsClickTriggered] = useState(false);
   const viewDropdownRef = useRef<HTMLDivElement>(null);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchPreferencesCallback = useCallback(async () => {
     if (!user) return;
@@ -90,7 +89,7 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
     }
   }, [profile]);
 
-  const applyFilters = useCallback(() => {
+  const filteredEvents = useMemo(() => {
     let filtered = [...events];
 
     if (filters.search) {
@@ -160,12 +159,12 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
       filtered = filtered.filter((event) => event.age_limit === filters.ageLimit);
     }
 
-    setFilteredEvents(filtered);
+    return filtered;
   }, [events, filters]);
 
   const handleApplyFilters = useCallback(() => {
-    applyFilters();
-  }, [applyFilters]);
+    // Filters are already applied via useMemo
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -181,9 +180,6 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
     }
   }, [preferences, fetchEventsCallback, user]);
 
-  useEffect(() => {
-    applyFilters();
-  }, [events, filters, applyFilters]);
 
   useEffect(() => {
     if (selectedGenre) {
@@ -262,7 +258,8 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
               onClick={() => {
                 onClearGenre();
                 setFilters(prev => {
-                  const { genres: _, ...rest } = prev;
+                  const { genres: _genres, ...rest } = prev;
+                  void _genres;
                   return rest;
                 });
               }}

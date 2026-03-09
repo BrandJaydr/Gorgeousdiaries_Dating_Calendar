@@ -19,8 +19,8 @@ export function MegaMenu({ onGenreSelect, onViewChange, currentView }: MegaMenuP
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
-  const menuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const userMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const menuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userMenuTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchGenres = useCallback(async () => {
     const { data } = await supabase.from('genres').select('*').order('name');
