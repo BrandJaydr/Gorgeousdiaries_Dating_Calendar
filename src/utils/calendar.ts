@@ -38,7 +38,7 @@ export function getMonthDates(year: number, month: number): Date[] {
   startDate.setDate(startDate.getDate() - startDate.getDay());
 
   const dates: Date[] = [];
-  let currentDate = new Date(startDate);
+  const currentDate = new Date(startDate);
 
   while (
     currentDate <= lastDay ||

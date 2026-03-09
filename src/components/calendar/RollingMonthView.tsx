@@ -19,6 +19,12 @@ export const RollingMonthView = memo(({ events, onEventClick, onEventHover }: Ro
     groupEventsByDate(events),
     [events]
   );
+export const RollingMonthView = memo(function RollingMonthView({ events, onEventClick, onEventHover }: RollingMonthViewProps) {
+  const rollingDates = useMemo(() => getRollingMonthDates(new Date()), [
+    // Re-calculate if the day changes
+    new Date().toDateString()
+  ]);
+  const eventsByDate = useMemo(() => groupEventsByDate(events), [events]);
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
