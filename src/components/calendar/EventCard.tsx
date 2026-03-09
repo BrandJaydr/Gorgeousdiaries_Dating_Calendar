@@ -1,3 +1,5 @@
+import { memo } from 'react';
+import { Calendar, MapPin, DollarSign, Download } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Calendar, MapPin, DollarSign, Download, Check } from 'lucide-react';
 import { Event } from '../../types';
@@ -9,6 +11,7 @@ interface EventCardProps {
   showDistance?: boolean;
 }
 
+export const EventCard = memo(function EventCard({ event, onClick, showDistance }: EventCardProps) {
 export function EventCard({ event, onClick, showDistance }: EventCardProps) {
   const [isAdded, setIsAdded] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -42,6 +45,7 @@ export function EventCard({ event, onClick, showDistance }: EventCardProps) {
           <img
             src={event.image_url}
             alt={event.title}
+            loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
           {event.featured && (
@@ -130,4 +134,4 @@ export function EventCard({ event, onClick, showDistance }: EventCardProps) {
       </div>
     </div>
   );
-}
+});
