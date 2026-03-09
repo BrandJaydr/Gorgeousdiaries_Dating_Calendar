@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Event } from '../../types';
 import { getMonthDates, groupEventsByDate, isToday } from '../../utils/calendar';
@@ -11,15 +11,16 @@ interface MonthViewProps {
   onEventHover?: (event: Event | null) => void;
 }
 
-export const MonthView = memo(({ events, currentDate, onDateChange, onEventClick, onEventHover }: MonthViewProps) => {
-  // Memoize month dates to avoid recalculating on every render
+export const MonthView = memo(function MonthView({ events, currentDate, onDateChange, onEventClick, onEventHover }: MonthViewProps) {
   const monthDates = useMemo(() =>
     getMonthDates(currentDate.getFullYear(), currentDate.getMonth()),
     [currentDate]
   );
 
-  // Memoize event grouping to avoid O(n) calculation on every render
-  const eventsByDate = useMemo(() => groupEventsByDate(events), [events]);
+  const eventsByDate = useMemo(() =>
+    groupEventsByDate(events),
+    [events]
+  );
 
   const goToPreviousMonth = () => {
     const newDate = new Date(currentDate);
