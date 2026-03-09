@@ -162,6 +162,57 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
     return filtered;
   }, [events, filters]);
 
+  const fetchPreferencesCallback = useCallback(async () => {
+    if (!user) return;
+
+    const { data } = await supabase
+      .from('user_preferences')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    setPreferences(data);
+  }, [user]);
+
+  const fetchEventsCallback = useCallback(async (showPastEvents: boolean) => {
+    setLoading(true);
+    try {
+      let query = supabase
+        .from('events')
+        .select(`
+          *,
+          genres:event_genres(
+            genre:genres(*)
+          )
+        `);
+
+      if (profile?.role !== 'admin') {
+        query = query.eq('status', 'approved');
+      }
+
+      if (!showPastEvents) {
+        query = query.gte('event_date', new Date().toISOString().split('T')[0]);
+      }
+
+      query = query.order('event_date');
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      const eventsWithGenres = (data as any)?.map((event: any) => ({
+        ...event,
+        genres: event.genres?.map((eg: any) => eg.genre).filter(Boolean) || [],
+      })) || [];
+
+      setEvents(eventsWithGenres);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [profile]);
+
   const handleApplyFilters = useCallback(() => {
     // Filters are already applied via useMemo
   }, []);
