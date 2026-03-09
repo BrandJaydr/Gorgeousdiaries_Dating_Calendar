@@ -8,7 +8,6 @@ import { WeekView } from '../components/calendar/WeekView';
 import { MonthView } from '../components/calendar/MonthView';
 import { RollingMonthView } from '../components/calendar/RollingMonthView';
 import { FilterSidebar } from '../components/filters/FilterSidebar';
-import { EventCard } from '../components/calendar/EventCard';
 import { EventDetailModal } from '../components/calendar/EventDetailModal';
 
 const VIEW_LABELS: Record<CalendarView, string> = {
@@ -213,14 +212,14 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
     };
   }, []);
 
-  const handleEventClick = (event: Event) => {
+  const handleEventClick = useCallback((event: Event) => {
     if (preferences?.event_interaction_mode !== 'hover') {
       setIsClickTriggered(true);
       setSelectedEvent(event);
     }
-  };
+  }, [preferences?.event_interaction_mode]);
 
-  const handleEventHover = (event: Event | null) => {
+  const handleEventHover = useCallback((event: Event | null) => {
     if (preferences?.event_interaction_mode === 'hover' && !isClickTriggered) {
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
@@ -241,7 +240,7 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
         }, 1000);
       }
     }
-  };
+  }, [preferences?.event_interaction_mode, isClickTriggered]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -263,7 +262,7 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
               onClick={() => {
                 onClearGenre();
                 setFilters(prev => {
-                  const { genres, ...rest } = prev;
+                  const { genres: _, ...rest } = prev;
                   return rest;
                 });
               }}
