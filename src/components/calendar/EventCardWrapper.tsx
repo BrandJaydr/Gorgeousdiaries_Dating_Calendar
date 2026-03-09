@@ -10,7 +10,7 @@ interface EventCardWrapperProps {
 }
 
 export function EventCardWrapper({ event, interactionMode, onEventClick, showDistance }: EventCardWrapperProps) {
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
