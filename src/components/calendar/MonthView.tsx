@@ -11,6 +11,7 @@ interface MonthViewProps {
   onEventHover?: (event: Event | null) => void;
 }
 
+export const MonthView = memo(({ events, currentDate, onDateChange, onEventClick, onEventHover }: MonthViewProps) => {
 export const MonthView = memo(function MonthView({ events, currentDate, onDateChange, onEventClick, onEventHover }: MonthViewProps) {
   const monthDates = useMemo(() =>
     getMonthDates(currentDate.getFullYear(), currentDate.getMonth()),

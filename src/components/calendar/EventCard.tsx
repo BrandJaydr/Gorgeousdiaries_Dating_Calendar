@@ -11,6 +11,7 @@ interface EventCardProps {
   showDistance?: boolean;
 }
 
+export const EventCard = memo(({ event, onClick, showDistance }: EventCardProps) => {
 export const EventCard = memo(function EventCard({ event, onClick, showDistance }: EventCardProps) {
 export function EventCard({ event, onClick, showDistance }: EventCardProps) {
   const [isAdded, setIsAdded] = useState(false);

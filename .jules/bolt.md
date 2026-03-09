@@ -1,3 +1,8 @@
+## 2025-05-14 - React Performance Patterns in Calendar Apps
+
+**Learning:** In highly interactive applications like calendars, moving derived data (e.g., filtered lists) from 'useState' + 'useEffect' to 'useMemo' eliminates redundant render cycles. Furthermore, memoizing expensive data transformation functions like date generation and event grouping is critical for maintaining 60fps when navigating between views.
+
+**Action:** Always prefer 'useMemo' for derived state over 'useEffect' + 'useState'. Ensure that child components rendered in large lists (like 'EventCard') are wrapped in 'React.memo' to prevent re-render cascades.
 ## 2025-05-15 - [Initial Performance Audit]
 **Learning:** The calendar views (Month, Week, Rolling) perform expensive calculations (date generation, event grouping) on every render. Since `CalendarPage` frequently re-renders due to hover states and filter updates, these calculations and the subsequent re-rendering of many `EventCard` components create a noticeable lag.
 **Action:** Apply `React.memo` to view components and `EventCard`, and use `useMemo` for heavy data transformations. Add lazy loading to images to improve initial load and scroll performance.
