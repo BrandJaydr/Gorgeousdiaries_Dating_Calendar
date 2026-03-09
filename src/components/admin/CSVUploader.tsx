@@ -2,6 +2,29 @@ import { useState } from 'react';
 import { Upload, FileSpreadsheet, AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
+interface CSVRow {
+  [key: string]: string;
+}
+
+interface EventFromCSV {
+  title: string;
+  description: string;
+  event_date: string;
+  event_time: string | null;
+  venue_name: string | null;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string | null;
+  price: number | null;
+  dress_code: string | null;
+  age_limit: string | null;
+  phone_number: string | null;
+  image_url: string | null;
+  status: 'pending';
+  featured: false;
+}
+
 interface CSVUploaderProps {
   onImportComplete: () => void;
 }
@@ -25,16 +48,16 @@ export function CSVUploader({ onImportComplete }: CSVUploaderProps) {
     }
   };
 
-  const parseCSV = (text: string): any[] => {
+  const parseCSV = (text: string): CSVRow[] => {
     const lines = text.split('\n').filter(line => line.trim());
     if (lines.length < 2) return [];
 
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-    const rows = [];
+    const rows: CSVRow[] = [];
 
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim());
-      const row: any = {};
+      const row: CSVRow = {};
 
       headers.forEach((header, index) => {
         row[header] = values[index] || '';
@@ -46,7 +69,7 @@ export function CSVUploader({ onImportComplete }: CSVUploaderProps) {
     return rows;
   };
 
-  const mapCSVToEvent = (row: any): any => {
+  const mapCSVToEvent = (row: CSVRow): EventFromCSV => {
     return {
       title: row.title || row.event || row.name || row['event name'] || '',
       description: row.description || row.details || row.info || '',

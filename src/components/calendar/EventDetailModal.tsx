@@ -7,11 +7,10 @@ interface EventDetailModalProps {
   displayMode: EventDisplayMode;
   backgroundMode: EventBackgroundMode;
   overlayOpacity?: number;
-  isClickTriggered?: boolean;
   onClose: () => void;
 }
 
-export function EventDetailModal({ event, displayMode, backgroundMode, overlayOpacity = 50, isClickTriggered = false, onClose }: EventDetailModalProps) {
+export function EventDetailModal({ event, displayMode, backgroundMode, overlayOpacity = 50, onClose }: EventDetailModalProps) {
   const handleExport = (e: React.MouseEvent) => {
     e.stopPropagation();
     downloadICalendar(event);
@@ -43,7 +42,6 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
   const isImageBackground = backgroundMode === 'image' && event.image_url;
   const isBlurBackground = backgroundMode === 'blur' && event.image_url;
   const textColorClass = isImageBackground ? 'text-white' : 'text-gray-900';
-  const subTextColorClass = isImageBackground ? 'text-gray-200' : 'text-gray-600';
 
   if (displayMode === 'popup') {
     return (

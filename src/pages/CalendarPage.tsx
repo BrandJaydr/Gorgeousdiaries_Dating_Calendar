@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Filter, Calendar as CalendarIcon, List, ChevronDown } from 'lucide-react';
 import { Event, EventFilters, CalendarView, UserPreferences } from '../types';
 import { supabase } from '../lib/supabase';
@@ -24,7 +24,6 @@ interface CalendarPageProps {
 export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps) {
   const { user, profile } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [filters, setFilters] = useState<EventFilters>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [calendarView, setCalendarView] = useState<CalendarView>('month');
@@ -36,37 +35,10 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
   const [isViewDropdownOpen, setIsViewDropdownOpen] = useState(false);
   const [isClickTriggered, setIsClickTriggered] = useState(false);
   const viewDropdownRef = useRef<HTMLDivElement>(null);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const transitionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      fetchPreferences();
-    } else {
-      fetchEvents(false);
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (preferences !== null || !user) {
-      fetchEvents(preferences?.show_past_events || false);
-    }
-  }, [preferences, profile]);
-
-  useEffect(() => {
-    applyFilters();
-  }, [events, filters]);
-
-  useEffect(() => {
-    if (selectedGenre) {
-      setFilters(prev => ({
-        ...prev,
-        genres: [selectedGenre]
-      }));
-    }
-  }, [selectedGenre]);
-
-  const fetchPreferences = async () => {
+  const fetchPreferencesCallback = useCallback(async () => {
     if (!user) return;
 
     const { data } = await supabase
@@ -76,9 +48,9 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
       .maybeSingle();
 
     setPreferences(data);
-  };
+  }, [user]);
 
-  const fetchEvents = async (showPastEvents: boolean) => {
+  const fetchEventsCallback = useCallback(async (showPastEvents: boolean) => {
     setLoading(true);
     try {
       let query = supabase
@@ -104,9 +76,9 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
 
       if (error) throw error;
 
-      const eventsWithGenres = data?.map((event: any) => ({
+      const eventsWithGenres = data?.map((event) => ({
         ...event,
-        genres: event.genres?.map((eg: any) => eg.genre).filter(Boolean) || [],
+        genres: (event.genres as any)?.map((eg: any) => eg.genre).filter(Boolean) || [],
       })) || [];
 
       setEvents(eventsWithGenres);
@@ -115,9 +87,9 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
     } finally {
       setLoading(false);
     }
-  };
+  }, [profile]);
 
-  const applyFilters = useCallback(() => {
+  const filteredEvents = useMemo(() => {
     let filtered = [...events];
 
     if (filters.search) {
@@ -187,12 +159,36 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
       filtered = filtered.filter((event) => event.age_limit === filters.ageLimit);
     }
 
-    setFilteredEvents(filtered);
+    return filtered;
   }, [events, filters]);
 
   const handleApplyFilters = useCallback(() => {
-    applyFilters();
-  }, [applyFilters]);
+    // Filters are already applied via useMemo
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchPreferencesCallback();
+    } else {
+      fetchEventsCallback(false);
+    }
+  }, [user, fetchPreferencesCallback, fetchEventsCallback]);
+
+  useEffect(() => {
+    if (preferences !== null || !user) {
+      fetchEventsCallback(preferences?.show_past_events || false);
+    }
+  }, [preferences, fetchEventsCallback, user]);
+
+
+  useEffect(() => {
+    if (selectedGenre) {
+      setFilters(prev => ({
+        ...prev,
+        genres: [selectedGenre]
+      }));
+    }
+  }, [selectedGenre]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -263,6 +259,8 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
                 onClearGenre();
                 setFilters(prev => {
                   const { genres: _, ...rest } = prev;
+                  const { genres: _genres, ...rest } = prev;
+                  void _genres;
                   return rest;
                 });
               }}
@@ -456,7 +454,6 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
           displayMode={preferences?.event_display_mode || 'popup'}
           backgroundMode={preferences?.event_background_mode || 'white'}
           overlayOpacity={preferences?.overlay_opacity ?? 50}
-          isClickTriggered={isClickTriggered}
           onClose={() => {
             setSelectedEvent(null);
             setHoveredEvent(null);

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { Event, EventInteractionMode } from '../../types';
 import { EventCard } from './EventCard';
 
@@ -10,8 +10,7 @@ interface EventCardWrapperProps {
 }
 
 export function EventCardWrapper({ event, interactionMode, onEventClick, showDistance }: EventCardWrapperProps) {
-  const [isHovering, setIsHovering] = useState(false);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
@@ -30,7 +29,6 @@ export function EventCardWrapper({ event, interactionMode, onEventClick, showDis
   const handleMouseEnter = () => {
     if (interactionMode === 'hover') {
       hoverTimeoutRef.current = setTimeout(() => {
-        setIsHovering(true);
         onEventClick(event);
       }, 3000);
     }
@@ -40,7 +38,6 @@ export function EventCardWrapper({ event, interactionMode, onEventClick, showDis
     if (interactionMode === 'hover' && hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
       hoverTimeoutRef.current = null;
-      setIsHovering(false);
     }
   };
 
