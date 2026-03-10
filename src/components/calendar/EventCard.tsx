@@ -1,9 +1,7 @@
-import { memo } from 'react';
-import { Calendar, MapPin, DollarSign, Download } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { memo, useState, useRef, useEffect } from 'react';
 import { Calendar, MapPin, DollarSign, Download, Check } from 'lucide-react';
 import { Event } from '../../types';
-import { formatDate, formatTime } from '../../utils/calendar';
+import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
 import { ExportButton } from './ExportButton';
 
 interface EventCardProps {
@@ -12,9 +10,7 @@ interface EventCardProps {
   showDistance?: boolean;
 }
 
-export const EventCard = memo(({ event, onClick, showDistance }: EventCardProps) => {
 export const EventCard = memo(function EventCard({ event, onClick, showDistance }: EventCardProps) {
-export function EventCard({ event, onClick, showDistance }: EventCardProps) {
   const [isAdded, setIsAdded] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
