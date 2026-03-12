@@ -14,3 +14,8 @@
 **Vulnerability:** Supabase RLS 'UPDATE' policies do not provide column-level restrictions, allowing users to modify sensitive fields like 'role' or 'subscription_tier' if they have update access to their own record.
 **Learning:** Even with robust identity-based RLS, users can promote themselves to 'admin' by updating their own profile unless prevented by a 'BEFORE UPDATE' database trigger.
 **Prevention:** Implement 'BEFORE UPDATE' triggers on tables with sensitive columns to enforce field-level permissions, explicitly allowing exceptions for admins and system roles (null auth.uid()).
+
+## 2026-03-09 - Unauthorized Metadata Manipulation in Events Table
+**Vulnerability:** Organizers could self-approve events or mark them as "featured" by directly updating the 'status' and 'featured' columns in the 'events' table via the API, as RLS policies on 'UPDATE' only checked for row ownership.
+**Learning:** RLS 'UPDATE' policies in Supabase do not natively support column-level restrictions or state transition validation. A user with permission to update a row can modify any column in that row unless restricted by a database trigger.
+**Prevention:** Use a 'BEFORE INSERT OR UPDATE' trigger on tables with administrative metadata to enforce field-level security. Specifically, use 'current_setting(''role'') = ''service_role''' to accurately identify system-level operations and distinguish them from anonymous or authenticated user actions.

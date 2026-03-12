@@ -13,6 +13,10 @@ export const RollingMonthView = memo(function RollingMonthView({ events, onEvent
   const todayDateString = new Date().toDateString();
   const rollingDates = useMemo(() => getRollingMonthDates(new Date(todayDateString)), [
     todayDateString
+  const todayKey = new Date().toDateString();
+  const rollingDates = useMemo(() => getRollingMonthDates(new Date()), [
+    // Re-calculate if the day changes
+    todayKey
   ]);
   const eventsByDate = useMemo(() => groupEventsByDate(events), [events]);
 
