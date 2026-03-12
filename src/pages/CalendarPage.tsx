@@ -162,6 +162,7 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
     return filtered;
   }, [events, filters]);
 
+
   const handleApplyFilters = useCallback(() => {
     // With filteredEvents now as a useMemo, we don't need to manually trigger applyFilters.
     // However, we keep the callback to maintain the interface with FilterSidebar.

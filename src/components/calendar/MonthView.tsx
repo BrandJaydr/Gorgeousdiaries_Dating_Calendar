@@ -45,6 +45,7 @@ export const MonthView = memo(function MonthView({ events, currentDate, onDateCh
           <button
             onClick={goToPreviousMonth}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            aria-label="Previous Month"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -56,6 +57,7 @@ export const MonthView = memo(function MonthView({ events, currentDate, onDateCh
             <button
               onClick={goToToday}
               className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-medium transition-colors"
+              aria-label="Go to Today"
             >
               Today
             </button>
@@ -64,6 +66,7 @@ export const MonthView = memo(function MonthView({ events, currentDate, onDateCh
           <button
             onClick={goToNextMonth}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            aria-label="Next Month"
           >
             <ChevronRight className="w-5 h-5" />
           </button>

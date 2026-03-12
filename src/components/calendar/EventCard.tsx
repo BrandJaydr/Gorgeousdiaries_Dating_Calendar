@@ -38,8 +38,13 @@ export const EventCard = memo(function EventCard({ event, onClick, showDistance 
   return (
     <div
       onClick={onClick}
-      className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-300"
+      className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-300 relative"
     >
+      {event.featured && (
+        <div className="absolute top-2 right-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold z-10">
+          Featured
+        </div>
+      )}
       {event.image_url && (
         <div className="relative h-48 overflow-hidden">
           <img
@@ -48,11 +53,6 @@ export const EventCard = memo(function EventCard({ event, onClick, showDistance 
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          {event.featured && (
-            <div className="absolute top-2 right-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-              Featured
-            </div>
-          )}
         </div>
       )}
       <div className="p-4">

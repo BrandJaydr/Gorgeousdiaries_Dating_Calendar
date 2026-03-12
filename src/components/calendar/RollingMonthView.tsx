@@ -10,6 +10,9 @@ interface RollingMonthViewProps {
 }
 
 export const RollingMonthView = memo(function RollingMonthView({ events, onEventClick, onEventHover }: RollingMonthViewProps) {
+  const todayDateString = new Date().toDateString();
+  const rollingDates = useMemo(() => getRollingMonthDates(new Date(todayDateString)), [
+    todayDateString
   const todayKey = new Date().toDateString();
   const rollingDates = useMemo(() => getRollingMonthDates(new Date()), [
     // Re-calculate if the day changes
