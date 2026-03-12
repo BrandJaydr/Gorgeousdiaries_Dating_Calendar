@@ -1,9 +1,7 @@
 import { memo } from 'react';
 import { Calendar, MapPin, DollarSign } from 'lucide-react';
-import { memo, useState, useRef, useEffect } from 'react';
-import { Calendar, MapPin, DollarSign, Download, Check } from 'lucide-react';
 import { Event } from '../../types';
-import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
+import { formatDate, formatTime } from '../../utils/calendar';
 import { ExportButton } from './ExportButton';
 
 interface EventCardProps {
@@ -13,28 +11,6 @@ interface EventCardProps {
 }
 
 export const EventCard = memo(function EventCard({ event, onClick, showDistance }: EventCardProps) {
-  const [isAdded, setIsAdded] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  const handleExport = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    downloadICalendar(event);
-
-    setIsAdded(true);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setIsAdded(false);
-    }, 2000);
-  };
-
   return (
     <div
       onClick={onClick}
