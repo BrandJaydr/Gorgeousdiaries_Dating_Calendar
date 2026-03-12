@@ -14,6 +14,7 @@ interface EventCardProps {
 export const EventCard = memo(function EventCard({ event, onClick, onHover, showDistance }: EventCardProps) {
   // Note: Export state and feedback are handled by the ExportButton component
   // to keep this component focused and performant.
+export const EventCard = memo(function EventCard({ event, onClick, showDistance }: EventCardProps) {
   return (
     <div
       onClick={() => onClick?.(event)}
