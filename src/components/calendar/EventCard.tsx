@@ -6,14 +6,20 @@ import { ExportButton } from './ExportButton';
 
 interface EventCardProps {
   event: Event;
-  onClick?: () => void;
+  onClick?: (event: Event) => void;
+  onHover?: (event: Event | null) => void;
   showDistance?: boolean;
 }
 
+export const EventCard = memo(function EventCard({ event, onClick, onHover, showDistance }: EventCardProps) {
+  // Note: Export state and feedback are handled by the ExportButton component
+  // to keep this component focused and performant.
 export const EventCard = memo(function EventCard({ event, onClick, showDistance }: EventCardProps) {
   return (
     <div
-      onClick={onClick}
+      onClick={() => onClick?.(event)}
+      onMouseEnter={() => onHover?.(event)}
+      onMouseLeave={() => onHover?.(null)}
       className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-300 relative"
     >
       {event.featured && (
