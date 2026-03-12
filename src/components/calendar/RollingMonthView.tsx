@@ -9,20 +9,11 @@ interface RollingMonthViewProps {
   onEventHover?: (event: Event | null) => void;
 }
 
-export const RollingMonthView = memo(({ events, onEventClick, onEventHover }: RollingMonthViewProps) => {
-  const rollingDates = useMemo(() =>
-    getRollingMonthDates(new Date()),
-    []
-  );
-
-  const eventsByDate = useMemo(() =>
-    groupEventsByDate(events),
-    [events]
-  );
 export const RollingMonthView = memo(function RollingMonthView({ events, onEventClick, onEventHover }: RollingMonthViewProps) {
+  const todayKey = new Date().toDateString();
   const rollingDates = useMemo(() => getRollingMonthDates(new Date()), [
     // Re-calculate if the day changes
-    new Date().toDateString()
+    todayKey
   ]);
   const eventsByDate = useMemo(() => groupEventsByDate(events), [events]);
 
