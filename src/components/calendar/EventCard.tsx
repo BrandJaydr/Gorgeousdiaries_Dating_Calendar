@@ -1,43 +1,24 @@
 import { memo } from 'react';
 import { Calendar, MapPin, DollarSign } from 'lucide-react';
-import { memo, useState, useRef, useEffect } from 'react';
-import { Calendar, MapPin, DollarSign, Download, Check } from 'lucide-react';
 import { Event } from '../../types';
-import { formatDate, formatTime, downloadICalendar } from '../../utils/calendar';
+import { formatDate, formatTime } from '../../utils/calendar';
 import { ExportButton } from './ExportButton';
 
 interface EventCardProps {
   event: Event;
-  onClick?: () => void;
+  onClick?: (event: Event) => void;
+  onHover?: (event: Event | null) => void;
   showDistance?: boolean;
 }
 
-export const EventCard = memo(function EventCard({ event, onClick, showDistance }: EventCardProps) {
-  const [isAdded, setIsAdded] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
-  const handleExport = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    downloadICalendar(event);
-
-    setIsAdded(true);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setIsAdded(false);
-    }, 2000);
-  };
-
+export const EventCard = memo(function EventCard({ event, onClick, onHover, showDistance }: EventCardProps) {
+  // Note: Export state and feedback are handled by the ExportButton component
+  // to keep this component focused and performant.
   return (
     <div
-      onClick={onClick}
+      onClick={() => onClick?.(event)}
+      onMouseEnter={() => onHover?.(event)}
+      onMouseLeave={() => onHover?.(null)}
       className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-300 relative"
     >
       {event.featured && (

@@ -10,11 +10,10 @@ interface RollingMonthViewProps {
 }
 
 export const RollingMonthView = memo(function RollingMonthView({ events, onEventClick, onEventHover }: RollingMonthViewProps) {
-  const todayDateString = new Date().toDateString();
-  const rollingDates = useMemo(() => getRollingMonthDates(new Date(todayDateString)), [
-    todayDateString
   const todayKey = new Date().toDateString();
-  const rollingDates = useMemo(() => getRollingMonthDates(new Date()), [
+  const rollingDates = useMemo(() => {
+    return getRollingMonthDates(new Date(todayKey));
+  }, [
     // Re-calculate if the day changes
     todayKey
   ]);
@@ -74,16 +73,12 @@ export const RollingMonthView = memo(function RollingMonthView({ events, onEvent
               {dayEvents.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {dayEvents.map((event) => (
-                    <div
+                    <EventCard
                       key={event.id}
-                      onMouseEnter={() => onEventHover?.(event)}
-                      onMouseLeave={() => onEventHover?.(null)}
-                    >
-                      <EventCard
-                        event={event}
-                        onClick={() => onEventClick(event)}
-                      />
-                    </div>
+                      event={event}
+                      onClick={onEventClick}
+                      onHover={onEventHover}
+                    />
                   ))}
                 </div>
               ) : (

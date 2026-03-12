@@ -99,16 +99,12 @@ export const WeekView = memo(function WeekView({ events, currentDate, onDateChan
               <div className="p-2 min-h-[400px] overflow-y-auto space-y-2">
                 {dayEvents.length > 0 ? (
                   dayEvents.map((event) => (
-                    <div
+                    <EventCard
                       key={event.id}
-                      onMouseEnter={() => onEventHover?.(event)}
-                      onMouseLeave={() => onEventHover?.(null)}
-                    >
-                      <EventCard
-                        event={event}
-                        onClick={() => onEventClick(event)}
-                      />
-                    </div>
+                      event={event}
+                      onClick={onEventClick}
+                      onHover={onEventHover}
+                    />
                   ))
                 ) : (
                   <p className="text-sm text-gray-400 text-center mt-8">No events</p>
