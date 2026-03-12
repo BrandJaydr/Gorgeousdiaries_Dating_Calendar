@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Filter, Calendar as CalendarIcon, List, ChevronDown } from 'lucide-react';
+import { Filter, Calendar as CalendarIcon, List, ChevronDown, Search } from 'lucide-react';
 import { Event, Genre, EventFilters, CalendarView, UserPreferences } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -372,6 +372,25 @@ export function CalendarPage({ selectedGenre, onClearGenre }: CalendarPageProps)
         {loading ? (
           <div className="flex items-center justify-center h-96">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : filteredEvents.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-96 bg-white rounded-lg shadow-md border border-gray-100 p-8 text-center animate-in fade-in zoom-in duration-300">
+            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+              <Search className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">No events found</h3>
+            <p className="text-gray-600 mb-6 max-w-sm">
+              Try adjusting your filters or search terms to find what you're looking for.
+            </p>
+            <button
+              onClick={() => {
+                setFilters({});
+                onClearGenre?.();
+              }}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+            >
+              Clear all filters
+            </button>
           </div>
         ) : (
           <>
