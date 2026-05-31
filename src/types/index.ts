@@ -29,6 +29,12 @@ export interface Event {
   phone_number: string | null;
   image_url: string | null;
   organizer_id: string | null;
+  organizer_name: string | null;
+  website: string | null;
+  ticket_url: string | null;
+  source_url: string | null;
+  last_verified: string | null;
+  notes: string | null;
   status: 'pending' | 'approved' | 'rejected';
   featured: boolean;
   created_at: string;
