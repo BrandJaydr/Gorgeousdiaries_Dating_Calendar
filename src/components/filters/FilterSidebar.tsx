@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, MapPin, Navigation, Filter, Search } from 'lucide-react';
-import { EventFilters, Genre } from '../../types';
+import { EventFilters, Genre, EventCategory, Tag } from '../../types';
 import { US_STATES } from '../../utils/states';
 import { getCurrentLocation, geocodeAddress } from '../../utils/geolocation';
 import { supabase } from '../../lib/supabase';
@@ -15,16 +15,30 @@ interface FilterSidebarProps {
 
 export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApplyFilters }: FilterSidebarProps) {
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [categories, setCategories] = useState<EventCategory[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [locationInput, setLocationInput] = useState('');
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   useEffect(() => {
     fetchGenres();
+    fetchCategories();
+    fetchTags();
   }, []);
 
   const fetchGenres = async () => {
     const { data } = await supabase.from('genres').select('*').order('name');
     if (data) setGenres(data);
+  };
+
+  const fetchCategories = async () => {
+    const { data } = await supabase.from('event_categories').select('*').order('sort_order');
+    if (data) setCategories(data);
+  };
+
+  const fetchTags = async () => {
+    const { data } = await supabase.from('tags').select('*').order('name');
+    if (data) setTags(data);
   };
 
   const handleUseCurrentLocation = async () => {
@@ -62,14 +76,28 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
     const newGenres = currentGenres.includes(genreId)
       ? currentGenres.filter((id) => id !== genreId)
       : [...currentGenres, genreId];
-
     onFiltersChange({ ...filters, genres: newGenres });
+  };
+
+  const handleTagToggle = (tagId: string) => {
+    const currentTags = filters.tagIds || [];
+    const newTags = currentTags.includes(tagId)
+      ? currentTags.filter((id) => id !== tagId)
+      : [...currentTags, tagId];
+    onFiltersChange({ ...filters, tagIds: newTags });
   };
 
   const clearFilters = () => {
     onFiltersChange({});
     setLocationInput('');
   };
+
+  // Group tags by domain for display
+  const tagsByDomain = tags.reduce<Record<string, Tag[]>>((acc, tag) => {
+    if (!acc[tag.domain]) acc[tag.domain] = [];
+    acc[tag.domain].push(tag);
+    return acc;
+  }, {});
 
   if (!isOpen) return null;
 
@@ -96,6 +124,7 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
         </div>
 
         <div className="p-4 space-y-6">
+          {/* Location */}
           <div>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-gray-900">Location</h3>
@@ -189,6 +218,70 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
             />
           </div>
 
+          {/* Event Category */}
+          {categories.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">Event Type</h3>
+              <div className="grid grid-cols-2 gap-1.5">
+                {categories.map((cat) => {
+                  const active = filters.categoryId === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() =>
+                        onFiltersChange({
+                          ...filters,
+                          categoryId: active ? undefined : cat.id,
+                        })
+                      }
+                      className={`px-3 py-2 rounded-lg text-sm font-medium text-left transition-all border ${
+                        active
+                          ? 'text-white border-transparent'
+                          : 'text-gray-700 border-gray-200 hover:border-gray-300 bg-white'
+                      }`}
+                      style={active ? { backgroundColor: cat.color, borderColor: cat.color } : {}}
+                    >
+                      {cat.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Topic Tags */}
+          {tags.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-3">Topics</h3>
+              {Object.entries(tagsByDomain).map(([domain, domainTags]) => (
+                <div key={domain} className="mb-3">
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5 capitalize">
+                    {domain}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {domainTags.map((tag) => {
+                      const active = (filters.tagIds || []).includes(tag.id);
+                      return (
+                        <button
+                          key={tag.id}
+                          onClick={() => handleTagToggle(tag.id)}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
+                            active
+                              ? 'bg-blue-600 text-white border-blue-600'
+                              : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-blue-400 hover:text-blue-600'
+                          }`}
+                        >
+                          {tag.name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Entertainment Genres */}
           <div>
             <h3 className="font-semibold text-gray-900 mb-3">Entertainment Type</h3>
             <div className="space-y-2">
@@ -213,6 +306,7 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
             </div>
           </div>
 
+          {/* Date Range */}
           <div>
             <h3 className="font-semibold text-gray-900 mb-3">Date Range</h3>
             <div className="space-y-2">
@@ -235,6 +329,7 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
             </div>
           </div>
 
+          {/* Price Range */}
           <div>
             <h3 className="font-semibold text-gray-900 mb-3">Price Range</h3>
             <div className="space-y-2">
@@ -265,6 +360,7 @@ export function FilterSidebar({ isOpen, onClose, filters, onFiltersChange, onApp
             </div>
           </div>
 
+          {/* Age Restrictions */}
           <div>
             <h3 className="font-semibold text-gray-900 mb-3">Age Restrictions</h3>
             <select

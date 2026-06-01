@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Calendar, MapPin, DollarSign } from 'lucide-react';
+import { Calendar, MapPin, DollarSign, BadgeCheck } from 'lucide-react';
 import { Event } from '../../types';
 import { formatDate, formatTime } from '../../utils/calendar';
 import { ExportButton } from './ExportButton';
@@ -19,11 +19,20 @@ export const EventCard = memo(function EventCard({ event, onClick, onHover, show
       onMouseLeave={() => onHover?.(null)}
       className="group bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer border border-gray-100 hover:border-blue-300 relative"
     >
-      {event.featured && (
-        <div className="absolute top-2 right-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold z-10">
-          Featured
-        </div>
-      )}
+      <div className="absolute top-2 right-2 flex flex-col items-end gap-1 z-10">
+        {event.featured && (
+          <div className="bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+            Featured
+          </div>
+        )}
+        {event.verified && (
+          <div className="bg-emerald-500 text-white px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+            <BadgeCheck className="w-3 h-3" />
+            Verified
+          </div>
+        )}
+      </div>
+
       {event.image_url && (
         <div className="relative h-48 overflow-hidden">
           <img
@@ -35,12 +44,29 @@ export const EventCard = memo(function EventCard({ event, onClick, onHover, show
         </div>
       )}
       <div className="p-4">
+        {event.category && (
+          <div className="mb-2">
+            <span
+              className="px-2 py-0.5 text-xs font-medium rounded text-white"
+              style={{ backgroundColor: event.category.color }}
+            >
+              {event.category.name}
+            </span>
+          </div>
+        )}
+
         <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
           {event.title}
         </h3>
 
+        {event.series && (
+          <p className="text-xs text-gray-500 mb-2 font-medium">
+            Part of {event.series.name}
+          </p>
+        )}
+
         {event.genres && event.genres.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
+          <div className="flex flex-wrap gap-1 mb-2">
             {event.genres.map((genre) => (
               <span
                 key={genre.id}
@@ -48,6 +74,19 @@ export const EventCard = memo(function EventCard({ event, onClick, onHover, show
                 style={{ backgroundColor: genre.color }}
               >
                 {genre.name}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {event.tags && event.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {event.tags.map((tag) => (
+              <span
+                key={tag.id}
+                className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600 border border-gray-200"
+              >
+                {tag.name}
               </span>
             ))}
           </div>

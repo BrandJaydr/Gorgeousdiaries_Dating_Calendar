@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { Event, Genre } from '../../types';
+import { Event, Genre, EventCategory, Tag, EventSeries } from '../../types';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { US_STATES } from '../../utils/states';
@@ -16,9 +16,12 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
   const { user, profile } = useAuth();
   const isAdmin = profile?.role === 'admin';
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [categories, setCategories] = useState<EventCategory[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [seriesList, setSeriesList] = useState<EventSeries[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [organizers, setOrganizers] = useState<any[]>([]);
+  const [organizers, setOrganizers] = useState<{ id: string; full_name: string | null; email: string }[]>([]);
 
   const [formData, setFormData] = useState({
     title: event?.title || '',
@@ -36,13 +39,20 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
     phone_number: event?.phone_number || '',
     image_url: event?.image_url || '',
     selected_genres: event?.genres?.map((g) => g.id) || [],
+    selected_tags: event?.tags?.map((t) => t.id) || [],
+    category_id: event?.category_id || '',
+    series_id: event?.series_id || '',
     organizer_id: event?.organizer_id || (isAdmin ? '' : user?.id || ''),
     status: event?.status || 'pending',
     featured: event?.featured || false,
+    verified: event?.verified || false,
   });
 
   useEffect(() => {
     fetchGenres();
+    fetchCategories();
+    fetchTags();
+    fetchSeries();
     if (isAdmin) {
       fetchOrganizers();
     }
@@ -51,6 +61,21 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
   const fetchGenres = async () => {
     const { data } = await supabase.from('genres').select('*').order('name');
     if (data) setGenres(data);
+  };
+
+  const fetchCategories = async () => {
+    const { data } = await supabase.from('event_categories').select('*').order('sort_order');
+    if (data) setCategories(data);
+  };
+
+  const fetchTags = async () => {
+    const { data } = await supabase.from('tags').select('*').order('name');
+    if (data) setTags(data);
+  };
+
+  const fetchSeries = async () => {
+    const { data } = await supabase.from('event_series').select('id, name, frequency').order('name');
+    if (data) setSeriesList(data as EventSeries[]);
   };
 
   const fetchOrganizers = async () => {
@@ -91,8 +116,11 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
         phone_number: formData.phone_number || null,
         image_url: formData.image_url || null,
         organizer_id: isAdmin && formData.organizer_id ? formData.organizer_id : user.id,
-        status: isAdmin ? formData.status : 'pending',
+        category_id: formData.category_id || null,
+        series_id: formData.series_id || null,
+        status: isAdmin ? formData.status as Event['status'] : 'pending' as const,
         featured: isAdmin ? formData.featured : false,
+        verified: isAdmin ? formData.verified : false,
       };
 
       let eventId = event?.id;
@@ -114,20 +142,26 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
       }
 
       if (eventId) {
+        // Sync genres
         await supabase.from('event_genres').delete().eq('event_id', eventId);
-
         if (formData.selected_genres.length > 0) {
-          const genreInserts = formData.selected_genres.map((genreId) => ({
-            event_id: eventId,
-            genre_id: genreId,
-          }));
-          await supabase.from('event_genres').insert(genreInserts);
+          await supabase.from('event_genres').insert(
+            formData.selected_genres.map((genreId) => ({ event_id: eventId, genre_id: genreId }))
+          );
+        }
+
+        // Sync tags
+        await supabase.from('event_tags').delete().eq('event_id', eventId);
+        if (formData.selected_tags.length > 0) {
+          await supabase.from('event_tags').insert(
+            formData.selected_tags.map((tagId) => ({ event_id: eventId, tag_id: tagId }))
+          );
         }
       }
 
       onSuccess();
-    } catch (err: any) {
-      setError(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
@@ -139,6 +173,15 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
       selected_genres: prev.selected_genres.includes(genreId)
         ? prev.selected_genres.filter((id) => id !== genreId)
         : [...prev.selected_genres, genreId],
+    }));
+  };
+
+  const handleTagToggle = (tagId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      selected_tags: prev.selected_tags.includes(tagId)
+        ? prev.selected_tags.filter((id) => id !== tagId)
+        : [...prev.selected_tags, tagId],
     }));
   };
 
@@ -318,8 +361,43 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
               />
             </div>
 
+            {/* Event Category */}
+            {categories.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Event Type</label>
+                <select
+                  value={formData.category_id}
+                  onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select type (optional)</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Event Series */}
+            {seriesList.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Event Series</label>
+                <select
+                  value={formData.series_id}
+                  onChange={(e) => setFormData({ ...formData, series_id: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Standalone event</option>
+                  {seriesList.map((s) => (
+                    <option key={s.id} value={s.id}>{s.name} ({s.frequency})</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* Genres */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-3">Categories *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-3">Entertainment Genres</label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {genres.map((genre) => (
                   <label
@@ -346,6 +424,33 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
               </div>
             </div>
 
+            {/* Tags */}
+            {tags.length > 0 && (
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Topic Tags</label>
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag) => {
+                    const active = formData.selected_tags.includes(tag.id);
+                    return (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => handleTagToggle(tag.id)}
+                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all border ${
+                          active
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-gray-50 text-gray-600 border-gray-200 hover:border-blue-400 hover:text-blue-600'
+                        }`}
+                      >
+                        {tag.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Admin-only controls */}
             {isAdmin && (
               <>
                 <div>
@@ -368,25 +473,35 @@ export function EventForm({ event, onClose, onSuccess }: EventFormProps) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                   <select
                     value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value as 'pending' | 'approved' | 'rejected' })}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as Event['status'] })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="pending">Pending</option>
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
+                    <option value="archived">Archived</option>
                   </select>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="featured"
-                    checked={formData.featured}
-                    onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                    className="w-4 h-4 rounded"
-                  />
-                  <label htmlFor="featured" className="text-sm font-medium text-gray-700">
-                    Feature this event
+                <div className="flex items-center gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.featured}
+                      onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Featured event</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.verified}
+                      onChange={(e) => setFormData({ ...formData, verified: e.target.checked })}
+                      className="w-4 h-4 rounded"
+                    />
+                    <span className="text-sm font-medium text-gray-700">Verified</span>
                   </label>
                 </div>
               </>

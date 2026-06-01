@@ -1,4 +1,4 @@
-import { X, Calendar, MapPin, Clock, DollarSign, Phone, Navigation } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, DollarSign, Phone, Navigation, BadgeCheck, Globe, Ticket, RefreshCw } from 'lucide-react';
 import { Event, EventDisplayMode, EventBackgroundMode } from '../../types';
 import { formatDate, formatTime } from '../../utils/calendar';
 import { ExportButton } from './ExportButton';
@@ -75,10 +75,32 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
           </div>
 
           <div className="p-6">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">{event.title}</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{event.title}</h2>
+
+            {/* Verified + Category + Series */}
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              {event.verified && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
+                  <BadgeCheck className="w-3 h-3" /> Verified
+                </span>
+              )}
+              {event.category && (
+                <span
+                  className="px-2 py-0.5 rounded text-xs font-medium text-white"
+                  style={{ backgroundColor: event.category.color }}
+                >
+                  {event.category.name}
+                </span>
+              )}
+              {event.series && (
+                <span className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded text-xs font-medium">
+                  {event.series.name} series
+                </span>
+              )}
+            </div>
 
             {event.genres && event.genres.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="flex flex-wrap gap-2 mb-3">
                 {event.genres.map((genre) => (
                   <span
                     key={genre.id}
@@ -86,6 +108,19 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
                     style={{ backgroundColor: genre.color }}
                   >
                     {genre.name}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {event.tags && event.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {event.tags.map((tag) => (
+                  <span
+                    key={tag.id}
+                    className="px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded-full text-xs"
+                  >
+                    {tag.name}
                   </span>
                 ))}
               </div>
@@ -165,6 +200,48 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
               )}
             </div>
 
+            {(event.website || event.ticket_url) && (
+              <div className="flex gap-3 mb-4">
+                {event.ticket_url && (
+                  <a
+                    href={event.ticket_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                  >
+                    <Ticket className="w-4 h-4" />
+                    Get Tickets
+                  </a>
+                )}
+                {event.website && (
+                  <a
+                    href={event.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+                  >
+                    <Globe className="w-4 h-4" />
+                    Event Website
+                  </a>
+                )}
+              </div>
+            )}
+
+            {event.series && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                <div className="flex items-center gap-2 mb-1">
+                  <RefreshCw className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-900">Part of {event.series.name}</span>
+                </div>
+                {event.series.description && (
+                  <p className="text-xs text-blue-700">{event.series.description}</p>
+                )}
+                {event.series.frequency && (
+                  <p className="text-xs text-blue-600 mt-1 capitalize">{event.series.frequency} event</p>
+                )}
+              </div>
+            )}
+
             <div className="flex gap-3">
               <ExportButton event={event} className="flex-1 py-3" iconSize={5} />
               <button
@@ -234,7 +311,7 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
               )}
 
               {event.genres && event.genres.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-6">
+                <div className="flex flex-wrap gap-2 mb-3">
                   {event.genres.map((genre) => (
                     <span
                       key={genre.id}
@@ -242,6 +319,41 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
                       style={{ backgroundColor: genre.color }}
                     >
                       {genre.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Verified + Category + Series badges */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                {event.verified && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-xs font-semibold">
+                    <BadgeCheck className="w-3 h-3" /> Verified
+                  </span>
+                )}
+                {event.category && (
+                  <span
+                    className="px-2 py-0.5 rounded text-xs font-medium text-white"
+                    style={{ backgroundColor: event.category.color }}
+                  >
+                    {event.category.name}
+                  </span>
+                )}
+                {event.series && (
+                  <span className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 rounded text-xs font-medium">
+                    {event.series.name} series
+                  </span>
+                )}
+              </div>
+
+              {event.tags && event.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-6">
+                  {event.tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 rounded-full text-xs"
+                    >
+                      {tag.name}
                     </span>
                   ))}
                 </div>
@@ -325,6 +437,51 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
                 </div>
               </div>
 
+              {(event.website || event.ticket_url || event.series) && (
+                <div className="mb-6 space-y-3">
+                  {(event.website || event.ticket_url) && (
+                    <div className="flex gap-3">
+                      {event.ticket_url && (
+                        <a
+                          href={event.ticket_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        >
+                          <Ticket className="w-4 h-4" />
+                          Get Tickets
+                        </a>
+                      )}
+                      {event.website && (
+                        <a
+                          href={event.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                        >
+                          <Globe className="w-4 h-4" />
+                          Event Website
+                        </a>
+                      )}
+                    </div>
+                  )}
+                  {event.series && (
+                    <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                      <div className="flex items-center gap-2 mb-1">
+                        <RefreshCw className="w-4 h-4 text-blue-600" />
+                        <span className="text-sm font-semibold text-blue-900">Part of {event.series.name}</span>
+                        {event.series.frequency && (
+                          <span className="text-xs text-blue-600 capitalize">({event.series.frequency})</span>
+                        )}
+                      </div>
+                      {event.series.description && (
+                        <p className="text-xs text-blue-700">{event.series.description}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="flex gap-4">
                 <ExportButton event={event} className="flex-1 py-4 text-lg" iconSize={6} />
                 <button
@@ -382,10 +539,32 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
             )}
 
             <div className="p-8 md:p-12">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{event.title}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">{event.title}</h1>
+
+              {/* Verified + Category + Series badges */}
+              <div className="flex flex-wrap items-center gap-2 mb-6">
+                {event.verified && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold">
+                    <BadgeCheck className="w-4 h-4" /> Verified
+                  </span>
+                )}
+                {event.category && (
+                  <span
+                    className="px-3 py-1 rounded text-sm font-medium text-white"
+                    style={{ backgroundColor: event.category.color }}
+                  >
+                    {event.category.name}
+                  </span>
+                )}
+                {event.series && (
+                  <span className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded text-sm font-medium">
+                    {event.series.name} series
+                  </span>
+                )}
+              </div>
 
               {event.genres && event.genres.length > 0 && (
-                <div className="flex flex-wrap gap-3 mb-8">
+                <div className="flex flex-wrap gap-3 mb-4">
                   {event.genres.map((genre) => (
                     <span
                       key={genre.id}
@@ -393,6 +572,19 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
                       style={{ backgroundColor: genre.color }}
                     >
                       {genre.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {event.tags && event.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {event.tags.map((tag) => (
+                    <span
+                      key={tag.id}
+                      className="px-3 py-1 bg-gray-100 text-gray-600 border border-gray-200 rounded-full text-sm"
+                    >
+                      {tag.name}
                     </span>
                   ))}
                 </div>
@@ -475,6 +667,51 @@ export function EventDetailModal({ event, displayMode, backgroundMode, overlayOp
                   )}
                 </div>
               </div>
+
+              {(event.website || event.ticket_url || event.series) && (
+                <div className="mb-8 space-y-4">
+                  {(event.website || event.ticket_url) && (
+                    <div className="flex gap-4">
+                      {event.ticket_url && (
+                        <a
+                          href={event.ticket_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
+                        >
+                          <Ticket className="w-5 h-5" />
+                          Get Tickets
+                        </a>
+                      )}
+                      {event.website && (
+                        <a
+                          href={event.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-lg"
+                        >
+                          <Globe className="w-5 h-5" />
+                          Event Website
+                        </a>
+                      )}
+                    </div>
+                  )}
+                  {event.series && (
+                    <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                      <div className="flex items-center gap-3 mb-2">
+                        <RefreshCw className="w-5 h-5 text-blue-600" />
+                        <span className="text-lg font-semibold text-blue-900">Part of {event.series.name}</span>
+                        {event.series.frequency && (
+                          <span className="text-sm text-blue-600 capitalize">({event.series.frequency})</span>
+                        )}
+                      </div>
+                      {event.series.description && (
+                        <p className="text-sm text-blue-700">{event.series.description}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="flex gap-4">
                 <ExportButton event={event} className="flex-1 py-5 text-xl" iconSize={7} />

@@ -8,6 +8,43 @@ export interface Genre {
   created_at: string;
 }
 
+export interface EventCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  icon_name: string | null;
+  color: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  domain: string;
+  created_at: string;
+}
+
+export interface EventSeries {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  organizer_name: string | null;
+  organizer_id: string | null;
+  website: string | null;
+  image_url: string | null;
+  category_id: string | null;
+  founded_year: number | null;
+  frequency: 'annual' | 'biannual' | 'monthly' | 'irregular';
+  created_at: string;
+  updated_at: string;
+  category?: EventCategory;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -35,17 +72,26 @@ export interface Event {
   source_url: string | null;
   last_verified: string | null;
   notes: string | null;
-  status: 'pending' | 'approved' | 'rejected';
+  verified: boolean;
+  duplicate_check: boolean;
+  status: 'pending' | 'approved' | 'rejected' | 'archived';
   featured: boolean;
+  category_id: string | null;
+  series_id: string | null;
   created_at: string;
   updated_at: string;
   genres?: Genre[];
+  category?: EventCategory;
+  tags?: Tag[];
+  series?: EventSeries;
   distance?: number;
 }
 
 export interface EventFilters {
   search?: string;
   genres?: string[];
+  categoryId?: string;
+  tagIds?: string[];
   state?: string;
   city?: string;
   zipCode?: string;
@@ -59,6 +105,7 @@ export interface EventFilters {
   ageLimit?: string;
   dressCode?: string;
   featured?: boolean;
+  seriesId?: string;
 }
 
 export type CalendarView = 'week' | 'month' | 'rolling';

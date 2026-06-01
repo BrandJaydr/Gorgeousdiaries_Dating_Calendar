@@ -42,6 +42,51 @@ export interface Database {
           created_at: string;
         };
       };
+      event_categories: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          icon_name: string | null;
+          color: string;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['event_categories']['Row'], 'id' | 'created_at'>;
+        Update: Partial<Database['public']['Tables']['event_categories']['Insert']>;
+      };
+      tags: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          domain: string;
+          created_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['tags']['Row'], 'id' | 'created_at'>;
+        Update: Partial<Database['public']['Tables']['tags']['Insert']>;
+      };
+      event_series: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          description: string | null;
+          organizer_name: string | null;
+          organizer_id: string | null;
+          website: string | null;
+          image_url: string | null;
+          category_id: string | null;
+          founded_year: number | null;
+          frequency: 'annual' | 'biannual' | 'monthly' | 'irregular';
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database['public']['Tables']['event_series']['Row'], 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Database['public']['Tables']['event_series']['Insert']>;
+      };
       events: {
         Row: {
           id: string;
@@ -64,8 +109,18 @@ export interface Database {
           phone_number: string | null;
           image_url: string | null;
           organizer_id: string | null;
-          status: 'pending' | 'approved' | 'rejected';
+          organizer_name: string | null;
+          website: string | null;
+          ticket_url: string | null;
+          source_url: string | null;
+          last_verified: string | null;
+          notes: string | null;
+          verified: boolean;
+          duplicate_check: boolean;
+          status: 'pending' | 'approved' | 'rejected' | 'archived';
           featured: boolean;
+          category_id: string | null;
+          series_id: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -76,6 +131,12 @@ export interface Database {
         Row: {
           event_id: string;
           genre_id: string;
+        };
+      };
+      event_tags: {
+        Row: {
+          event_id: string;
+          tag_id: string;
         };
       };
     };

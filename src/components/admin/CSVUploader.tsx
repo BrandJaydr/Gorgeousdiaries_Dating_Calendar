@@ -29,6 +29,8 @@ interface EventFromCSV {
   notes: string | null;
   status: 'pending';
   featured: false;
+  verified: false;
+  duplicate_check: false;
 }
 
 interface CSVUploaderProps {
@@ -146,6 +148,8 @@ function mapCSVToEvent(row: CSVRow): EventFromCSV {
     notes: col(row, 'notes', 'note', 'internal_notes', 'comments') || null,
     status: 'pending',
     featured: false,
+    verified: false,
+    duplicate_check: false,
   };
 }
 
@@ -311,6 +315,9 @@ export function CSVUploader({ onImportComplete }: CSVUploaderProps) {
                 <li>ticket_url — purchase link</li>
                 <li>source_url — where data came from</li>
                 <li>notes — internal admin notes</li>
+                <li>category — event type (Convention, etc.)</li>
+                <li>series — recurring event brand name</li>
+                <li>tags — comma-separated topic tags</li>
               </ul>
             </div>
             <div>
